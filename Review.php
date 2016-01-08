@@ -17,27 +17,55 @@ echo ".<br/>";
 
 $position = (isset($_GET['board'])) ? $_GET['board'] : die();
 $squares = str_split($position);
-function winner($token, $position) {
-	for($row=0; $row<3; $row++) {
-		$result = true;
+class Game {
+    var $position;
+    function __construct($squares) {
+        $this->position = str_split($squares);
+    }
+	function winner($token) {
+		for($row=0; $row<3; $row++) {
+			$result = true;
+			for($col=0; $col<3; $col++) {
+				if ($this -> position[3*$row+$col] != $token)
+					$result = false;
+			}
+			if($result)
+				return $result;
+		}
 		for($col=0; $col<3; $col++) {
-			if ($position[3*$row+$col] != $token)
-				$result = false;
+			$result = true;
+			for($row=0; $row<3; $row++) {
+				if($this -> position[$col+3*$row] != $token)
+					$result = false;
+			}
+			if($result)
+				return $result;
+		}
+		if ($this -> position[0] == $token && $this -> position[4] == $token && $this -> position[8] == $token)
+			return true;
+		if ($this -> position[2] == $token && $this -> position[4] == $token && $this -> position[6] == $token)
+			return true;
+		return $result;
+	}
+	function display() {
+		foreach($this->position as $cell) {
+			if ($i % 3 == 0) {
+				echo "<br/>";
+				$i = 0;
+			}
+			echo $thing . " ";
+			$i++;
 		}
 	}
-	/*$won = false;
-    if (($position[0] == $token) &&
-		($position[1] == $token) &&
-		($position[2] == $token)) {
-		$won = true;
-	} else if (($position[3] == $token) &&
-		($position[4] == $token) &&
-		($position[5] == $token)) {
-		$won = false;
-	}*/
-	return $result;
 }
-if (winner('x', $squares)) echo 'You win.';
-else if (winner('o', $squares)) echo 'I win.';
-else echo 'No winner yet.';
+$game = new Game($position);
+$game->display();
+if ($game->winner('x'))
+	echo 'You win. Luckey guesses!';
+else if ($game->winner('o'))
+	echo 'I win. Muahahahahaha';
+else
+	echo 'No winner yet, but you are losing.';
+
+$i = 0;
 ?>
