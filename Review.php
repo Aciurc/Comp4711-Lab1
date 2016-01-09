@@ -54,8 +54,8 @@ class Game {
 		echo '</tr></table>';
 	}
 	/*
-		Returns an element of $position 
-		Hyphen elements are anchors and allow the user to replace the hyphen
+		Checks element of the given index of $position.
+		Hyphen elements are anchor tags which allow the user to replace the hyphen
 		 with their own token.
 	*/
 	function show_cell($which) {
