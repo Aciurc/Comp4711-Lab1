@@ -1,27 +1,19 @@
 <?php
-$name = 'Anson';
-$what = 'php expert';
-$level = 1;
-
-$hoursworked = (isset($_GET['hours'])) ? $_GET['hours'] : 0;
-$rate = 12;
-if ($hoursworked > 40) {
-	$overtime = $hoursworked - 40;
-	$total = (($hoursworked - $overtime) + $overtime * 1.5) * $rate;
-} else {
-	$total = $hoursworked * $rate;
-}
-echo 'Hi, my name is ' . $name . ', and I am a level ' .$level. ' ' .$what . '<br/>';
-echo ($total > 0) ? 'You owe me $' .$total : "You're welcome";
-echo ".<br/>";
-
-$position = (isset($_GET['board'])) ? $_GET['board'] : die();
+$position = (isset($_GET['board'])) ? $_GET['board'] : "---------";
 $squares = str_split($position);
 class Game {
+	/* An array containing each tic tac toe cell. */
     var $position;
     function __construct($squares) {
         $this->position = str_split($squares);
     }
+	
+	/*
+		Checks to see if the specified token (e.g. 'x' or 'o' has won yet.)
+		Will check for horizontal, vertical,
+		and diagonal wins.
+		Returns true if someone has won; false if no one has won yet.
+	*/
 	function winner($token) {
 		for($row=0; $row<3; $row++) {
 			$result = true;
@@ -47,23 +39,43 @@ class Game {
 			return true;
 		return $result;
 	}
+	
+	/*
+		Calls show_cell() to display a 3 x 3 tic tac toe board.
+	*/
 	function display() {
-		foreach($this->position as $cell) {
-			if ($i % 3 == 0) {
-				echo "<br/>";
-				$i = 0;
-			}
-			echo $thing . " ";
-			$i++;
+		echo '<table cols="3" style="font-size:large; font-weight:bold">';
+		echo '<tr>';
+		for($pos = 0; $pos<9; $pos++) {
+			echo $this->show_cell($pos);
+			if ($pos %3 == 2) echo '</tr><tr>';
 		}
+		echo '</tr></table>';
+	}
+	/*
+		Iterates through $position and places each element in a 3 x 3 table.
+		Hyphen elements are anchors and allow the user to replace the hyphen
+		 with their own token.
+	*/
+	function show_cell($which) {
+		$token = $this->position[$which];
+		if ($token <> '-')
+			return '<td>'.$token.'</td>';
+		$this -> newposition = $this->position;
+		$this -> newposition[$which] = 'o';
+		$move = implode($this->newposition);
+		$link = $_SERVER['SCRIPT_NAME'].'/?board='.$move;
+		return '<td><a href="'.$link.'" style="text-decoration:none">-</a></td>';
 	}
 }
+echo "Welcome to the Tic Tac Toe Championship!";
 $game = new Game($position);
 $game->display();
 if ($game->winner('x'))
 	echo 'You win. Luckey guesses!';
-else if ($game->winner('o'))
+else if ($game->winner('o')) {
 	echo 'I win. Muahahahahaha';
+}
 else
 	echo 'No winner yet, but you are losing.';
 
