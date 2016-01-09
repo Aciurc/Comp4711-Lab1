@@ -1,6 +1,4 @@
 <?php
-$position = (isset($_GET['board'])) ? $_GET['board'] : "---------";
-$squares = str_split($position);
 class Game {
 	/* An array containing each tic tac toe cell. */
     var $position;
@@ -15,6 +13,7 @@ class Game {
 		Returns true if someone has won; false if no one has won yet.
 	*/
 	function winner($token) {
+		// Check for horizontal wins
 		for($row=0; $row<3; $row++) {
 			$result = true;
 			for($col=0; $col<3; $col++) {
@@ -24,6 +23,7 @@ class Game {
 			if($result)
 				return $result;
 		}
+		// Check for vertical wins
 		for($col=0; $col<3; $col++) {
 			$result = true;
 			for($row=0; $row<3; $row++) {
@@ -33,6 +33,7 @@ class Game {
 			if($result)
 				return $result;
 		}
+		// Check for diagonal wins
 		if ($this -> position[0] == $token && $this -> position[4] == $token && $this -> position[8] == $token)
 			return true;
 		if ($this -> position[2] == $token && $this -> position[4] == $token && $this -> position[6] == $token)
@@ -53,7 +54,7 @@ class Game {
 		echo '</tr></table>';
 	}
 	/*
-		Iterates through $position and places each element in a 3 x 3 table.
+		Returns an element of $position 
 		Hyphen elements are anchors and allow the user to replace the hyphen
 		 with their own token.
 	*/
@@ -67,17 +68,41 @@ class Game {
 		$link = $_SERVER['SCRIPT_NAME'].'/?board='.$move;
 		return '<td><a href="'.$link.'" style="text-decoration:none">-</a></td>';
 	}
+	/*
+		Chooses the first available cell and replaces it with an 'x' token.
+	*/
+	function pick_move() {
+		$empty_cells = array();
+		
+		// Populates an empty array with the position of each empty cell
+		for($cell = 0; $cell < count($this->position); $cell++) {
+			if ($this->position[$cell] == '-') {
+				array_push($empty_cells, $cell);
+			}
+		}
+		
+		// Replaces the first empty cell with an 'x' token and checks
+		//  again to see if the system has won.
+		if ($empty_cells) {
+			$this->position[$empty_cells[0]] = 'x';
+			if ($this->winner('x'))
+				echo '<i><b>I win. Muahahahahaha</b></i>';
+			else
+				echo 'No winner yet, but you are losing.';
+		}
+	}
 }
-echo "Welcome to the Tic Tac Toe Championship!";
-$game = new Game($position);
-$game->display();
-if ($game->winner('x'))
-	echo 'You win. Luckey guesses!';
-else if ($game->winner('o')) {
-	echo 'I win. Muahahahahaha';
-}
-else
-	echo 'No winner yet, but you are losing.';
 
-$i = 0;
+$position = (isset($_GET['board'])) ? $_GET['board'] : "---------";
+$squares = str_split($position);
+echo "<b>Welcome to the Tic Tac Toe Championship!</b><br/><br/>";
+$game = new Game($position);
+if ($game->winner('x'))
+	echo '<i><b>You win. Luckey guesses!</b></i>';
+else if ($game->winner('o'))
+	echo '<i><b>I win. Muahahahahaha</b></i>';
+else {
+	$game->pick_move();
+}
+$game->display();
 ?>
